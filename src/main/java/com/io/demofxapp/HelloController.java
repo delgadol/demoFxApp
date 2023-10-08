@@ -18,15 +18,16 @@ public class HelloController {
 
     @FXML
     protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
         if (!Objects.isNull(timeline)) {
             if(!isRunning){
                 timeline.play();
                 isRunning= true;
+                welcomeText.setText("Welcome to Surfing JavaFX Application!");
             }else{
                 timeline.stop();
                 segundosTranscurridos = 0;
                 isRunning= false;
+                welcomeText.setText("Bye to Surfing JavaFX Application!");
             }
         }
     }
@@ -39,12 +40,26 @@ public class HelloController {
 
     private double screenWidth;
     private double screenHeight;
+    private double screenWidthOrg;
+    private double screenHeightOrg;
 
     private void moveMouse() {
         Platform.runLater(() -> {
             try {
                 Robot robot = new Robot();
-                robot.mouseMove(screenWidth, screenHeight);
+                screenWidthOrg = robot.getMouseX();
+                screenHeightOrg = robot.getMouseY();
+                double deltaWX = (screenWidth-screenWidthOrg)/100;
+                double deltaHY = (screenHeight-screenHeightOrg)/100;
+                timeline.stop();
+                //isRunning = false;
+                for (int i=0; i<100; i++){
+                    robot.mouseMove(screenWidthOrg + (i * deltaWX), screenHeightOrg + (i * deltaHY));
+                    Thread.sleep(10);
+                }
+                timeline.play();
+                //isRunning = true;
+                //robot.mouseMove(screenWidth, screenHeight);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -55,7 +70,7 @@ public class HelloController {
         timeline = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
                     segundosTranscurridos++;
-                    welcomeText.setText("Segundos transcurridos: " + segundosTranscurridos);
+                    // welcomeText.setText("Segundos transcurridos: " + segundosTranscurridos);
                     getDisPlayPoint();
                     moveMouse();
                 })
